@@ -47,7 +47,7 @@ const Dashboard = () => {
 		dispatch(
 			createNewWorkflow({ id: newWorkflowId, name: newWorkflowName }),
 		);
-		dispatch(saveWorkflow());
+		dispatch(saveWorkflow(null));
 		dispatch(setCurrentWorkflow(newWorkflowId));
 		navigate(`/workflow/${newWorkflowId}`);
 		setNewWorkflowName('');

@@ -1,23 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NodeData, TableRow } from './workflowSlice';
 
-export interface TableRow {
-	[key: string]: string | number | boolean;
-}
-
-interface NodeData {
-	id: string;
-	data: TableRow[];
-	type: string;
-	position: { x: number; y: number };
-}
-
-interface NodeState {
+export interface NodeState {
 	nodesData: NodeData[];
 	selectedNodeData: {
 		nodeId: string;
 		type: string;
 		position: { x: number; y: number };
-		data: TableRow[];
+		data: TableRow[] | [];
+		selectedFile: string | null;
 	} | null;
 }
 
@@ -30,6 +21,32 @@ const nodeSlice = createSlice({
 	name: 'nodes',
 	initialState,
 	reducers: {
+		removeNodeData: (state, action: PayloadAction<string>) => {
+			const findNodeIndex = state.nodesData.findIndex(
+				(n) => n.id === action.payload,
+			);
+			if (findNodeIndex !== -1) {
+				state.nodesData[findNodeIndex] = {
+					...state.nodesData[findNodeIndex],
+					selectedFile: null,
+					data: [],
+				};
+				if (state.selectedNodeData) {
+					state.selectedNodeData.data = [];
+					state.selectedNodeData.selectedFile = null;
+				}
+			}
+		},
+		loadNodes: (state, action: PayloadAction<string>) => {
+			const workflowData = localStorage.getItem(
+				`workflow-${action.payload}`,
+			);
+			if (workflowData) {
+				const workflow = JSON.parse(workflowData);
+				state.nodesData = workflow.nodesData;
+				state.selectedNodeData = workflow.selectedNodeData;
+			}
+		},
 		addNode: (
 			state,
 			action: PayloadAction<{
@@ -37,6 +54,7 @@ const nodeSlice = createSlice({
 				type: string;
 				data: TableRow[];
 				position: { x: number; y: number };
+				selectedFile: string | null;
 			}>,
 		) => {
 			state.nodesData.push({
@@ -44,6 +62,7 @@ const nodeSlice = createSlice({
 				data: action.payload.data,
 				type: action.payload.type,
 				position: action.payload.position,
+				selectedFile: action.payload.selectedFile,
 			});
 		},
 		setNodeData: (state, action: PayloadAction<NodeData>) => {
@@ -70,6 +89,7 @@ const nodeSlice = createSlice({
 				node.position = action.payload.position;
 			}
 		},
+
 		setSelectedNodeData: (
 			state,
 			action: PayloadAction<{
@@ -77,14 +97,21 @@ const nodeSlice = createSlice({
 				type: string;
 				data: TableRow[];
 				position: { x: number; y: number };
+				selectedFile: string | null;
 			}>,
 		) => {
-			state.selectedNodeData = { ...action.payload };
+			state.selectedNodeData = action.payload;
 		},
 	},
 });
 
-export const { addNode, setNodeData, setNodePosition, setSelectedNodeData } =
-	nodeSlice.actions;
+export const {
+	addNode,
+	setNodeData,
+	setNodePosition,
+	setSelectedNodeData,
+	loadNodes,
+	removeNodeData,
+} = nodeSlice.actions;
 
 export default nodeSlice.reducer;

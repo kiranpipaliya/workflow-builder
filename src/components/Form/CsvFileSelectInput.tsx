@@ -3,23 +3,25 @@ import { parse } from 'csv-parse/browser/esm/sync';
 import { useDispatch, useSelector } from 'react-redux';
 import DynamicInput from './DynamicInput';
 import { RootState } from 'store/store';
-import { setFileData, saveWorkflow } from 'store/workflowSlice';
-import { setNodeData, setSelectedNodeData } from 'store/nodeSlice';
+import { saveWorkflow } from 'store/workflowSlice';
+import {
+	removeNodeData,
+	setNodeData,
+	setSelectedNodeData,
+} from 'store/nodeSlice';
 import Button from 'components/Button';
 
 const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 	const dispatch = useDispatch();
-	const currentWorkflow = useSelector((state: RootState) =>
-		state.workflows.workflows.find(
-			(workflow) => workflow.id === state.workflows.currentWorkflowId,
-		),
-	);
+
 	const selectedNode = useSelector(
 		(state: RootState) => state.nodes.selectedNodeData,
 	);
-
+	const node = useSelector((state: RootState) =>
+		state.nodes.nodesData.find((n) => n.id === nodeId),
+	);
 	const handleRemoveFile = () => {
-		dispatch(setFileData({ fileName: '', data: [] }));
+		dispatch(removeNodeData(nodeId!));
 	};
 
 	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +34,7 @@ const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 					columns: true,
 					skip_empty_lines: true,
 				});
-				dispatch(setFileData({ fileName: file.name, data: records }));
+
 				if (selectedNode) {
 					dispatch(
 						setNodeData({
@@ -40,6 +42,7 @@ const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 							type: selectedNode.type,
 							data: records,
 							position: selectedNode.position,
+							selectedFile: file.name,
 						}),
 					);
 					dispatch(
@@ -48,10 +51,10 @@ const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 							type: selectedNode.type,
 							data: records,
 							position: selectedNode.position,
+							selectedFile: file.name,
 						}),
 					);
 				}
-				dispatch(saveWorkflow());
 			};
 			reader.readAsText(file);
 		}
@@ -59,18 +62,18 @@ const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 
 	return (
 		<div>
-			{!currentWorkflow?.selectedFileName && (
+			{!node?.selectedFile && (
 				<DynamicInput
 					type="file"
 					accept=".csv"
 					label="Add CSV File"
 					onChange={handleFileUpload}
-					disabled={!!currentWorkflow?.selectedFileName}
+					disabled={!!node?.selectedFile}
 				/>
 			)}
-			{currentWorkflow?.selectedFileName && (
+			{node?.selectedFile && (
 				<span className="my-4 flex items-center gap-4">
-					{currentWorkflow.selectedFileName}
+					{node.selectedFile}
 					<Button onClick={handleRemoveFile}>X</Button>
 				</span>
 			)}

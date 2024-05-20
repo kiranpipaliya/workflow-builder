@@ -6,13 +6,15 @@ import Button from 'components/Button';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { saveWorkflow } from 'store/workflowSlice';
+import { getState } from 'store/store';
 
 const Header = () => {
 	const params = useParams();
 	const dispatch = useDispatch();
 	const handleSaveWorkflow = () => {
+		const nodes = getState().nodes;
 		if (params.workflowId) {
-			dispatch(saveWorkflow());
+			dispatch(saveWorkflow(nodes));
 		}
 	};
 	return (

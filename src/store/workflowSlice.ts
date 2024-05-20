@@ -1,13 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AppDispatch, RootState } from './store';
+import { NodeState } from './nodeSlice';
 
 export interface TableRow {
 	[key: string]: string | number | boolean;
+}
+
+export interface NodeData {
+	id: string;
+	data: TableRow[];
+	type: string;
+	position: { x: number; y: number };
+	selectedFile: string | null;
+}
+
+interface EdgeData {
+	id: string;
+	source: string;
+	target: string;
+	animated?: boolean;
 }
 
 interface Workflow {
 	id: string;
 	name: string;
 	selectedFileName: string | null;
+	nodesData: NodeData[];
+	edgesData: EdgeData[];
 }
 
 interface WorkflowState {
@@ -32,6 +51,8 @@ const workflowSlice = createSlice({
 				id: action.payload.id,
 				name: action.payload.name,
 				selectedFileName: null,
+				nodesData: [],
+				edgesData: [],
 			};
 			state.workflows.push(newWorkflow);
 			state.currentWorkflowId = action.payload.id;
@@ -39,14 +60,19 @@ const workflowSlice = createSlice({
 		setCurrentWorkflow: (state, action: PayloadAction<string>) => {
 			state.currentWorkflowId = action.payload;
 		},
-		saveWorkflow: (state) => {
+		saveWorkflow: (state, action: PayloadAction<NodeState | null>) => {
 			const currentWorkflow = state.workflows.find(
 				(workflow) => workflow.id === state.currentWorkflowId,
 			);
 			if (currentWorkflow) {
+				const updatedWorkflow = {
+					...currentWorkflow,
+					...(action?.payload || {}),
+				};
+
 				localStorage.setItem(
 					`workflow-${currentWorkflow.id}`,
-					JSON.stringify(currentWorkflow),
+					JSON.stringify(updatedWorkflow),
 				);
 			}
 		},
@@ -78,17 +104,6 @@ const workflowSlice = createSlice({
 				state.currentWorkflowId = action.payload;
 			}
 		},
-		setFileData: (
-			state,
-			action: PayloadAction<{ fileName: string; data: TableRow[] }>,
-		) => {
-			const workflow = state.workflows.find(
-				(workflow) => workflow.id === state.currentWorkflowId,
-			);
-			if (workflow) {
-				workflow.selectedFileName = action.payload.fileName;
-			}
-		},
 	},
 });
 
@@ -98,7 +113,6 @@ export const {
 	saveWorkflow,
 	loadAllWorkflows,
 	loadWorkflow,
-	setFileData,
 } = workflowSlice.actions;
 
 export default workflowSlice.reducer;

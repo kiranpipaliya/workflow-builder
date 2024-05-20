@@ -15,6 +15,7 @@ const SidePanel = () => {
 				type: 'FileNode',
 				data: [],
 				position: { x: 100, y: 100 },
+				selectedFile: null,
 			}),
 		);
 	};

@@ -8,7 +8,11 @@ import ReactFlow, {
 } from 'reactflow';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store';
-import { setNodePosition, setSelectedNodeData } from 'store/nodeSlice';
+import {
+	loadNodes,
+	setNodePosition,
+	setSelectedNodeData,
+} from 'store/nodeSlice';
 import { setEdgesData } from 'store/edgeSlice';
 import FileNode from 'components/node/FileNode';
 import 'reactflow/dist/style.css';
@@ -21,12 +25,17 @@ const FlowCanvas = () => {
 		),
 	);
 	const nodesData = useSelector((state: RootState) => state.nodes.nodesData);
-	const edgesData = useSelector((state: RootState) => state.edge.edgesData);
+	const edgesData = useSelector((state: RootState) => state.edges.edgesData);
 
 	const nodeTypes = useMemo(() => ({ FileNode: FileNode }), []);
 
 	const [nodes, setNodes, onNodesChange] = useNodesState([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+	useEffect(() => {
+		if (currentWorkflow) {
+			dispatch(loadNodes(currentWorkflow.id));
+		}
+	}, [currentWorkflow?.id]);
 
 	useEffect(() => {
 		if (currentWorkflow) {
@@ -67,6 +76,7 @@ const FlowCanvas = () => {
 					type: node.type,
 					data: nodeData,
 					position: node.position,
+					selectedFile: node.selectedFile,
 				}),
 			);
 		},

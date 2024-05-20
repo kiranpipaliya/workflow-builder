@@ -1,16 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-import nodeSlice from './nodeSlice';
-import workflowSlice from './workflowSlice';
-import edgeSlice from './edgeSlice';
+import workflowReducer from './workflowSlice';
+import nodeReducer from './nodeSlice';
+import edgeReducer from './edgeSlice';
 
 export const store = configureStore({
 	reducer: {
-		workflows: workflowSlice,
-		nodes: nodeSlice,
-		edge: edgeSlice,
+		workflows: workflowReducer,
+		nodes: nodeReducer,
+		edges: edgeReducer,
 	},
 });
 
 export type RootState = ReturnType<typeof store.getState>;
+export const getState = store.getState;
 export type AppDispatch = typeof store.dispatch;
