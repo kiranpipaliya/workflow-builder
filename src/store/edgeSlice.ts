@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface EdgeData {
+export interface EdgeData {
 	id: string;
 	source: string;
 	target: string;
 	animated?: boolean;
+	data?: any;
 }
 
-interface EdgeState {
+export interface EdgeState {
 	edgesData: EdgeData[];
 }
 
@@ -19,12 +20,33 @@ const edgeSlice = createSlice({
 	name: 'edges',
 	initialState,
 	reducers: {
+		loadEdges: (state, action: PayloadAction<string>) => {
+			const workflowData = localStorage.getItem(
+				`workflow-${action.payload}`,
+			);
+			if (workflowData) {
+				const parsedWorkflowData = JSON.parse(workflowData);
+				const edgesData = parsedWorkflowData?.edges?.edgesData ?? [];
+				state.edgesData = edgesData;
+			}
+		},
 		setEdgesData: (state, action: PayloadAction<EdgeData[]>) => {
 			state.edgesData = action.payload;
+		},
+		updateEdgeData: (
+			state,
+			action: PayloadAction<{ id: string; data: any }>,
+		) => {
+			const edge = state.edgesData.find(
+				(edge) => edge.id === action.payload.id,
+			);
+			if (edge) {
+				edge.data = action.payload.data;
+			}
 		},
 	},
 });
 
-export const { setEdgesData } = edgeSlice.actions;
+export const { setEdgesData, updateEdgeData, loadEdges } = edgeSlice.actions;
 
 export default edgeSlice.reducer;

@@ -72,22 +72,29 @@ const Dashboard = () => {
 					Create New Workflow
 				</Button>
 			</div>
-			<div>
-				<h3>Existing Workflows</h3>
-				<ul>
-					{workflows.map((workflow) => (
-						<li key={workflow.id}>
-							<button
+			{!workflows.length && (
+				<div className="w-full mt-[100px] h-full flex items-center justify-center">
+					<h1 className="text-xl">Create new work flow </h1>
+				</div>
+			)}
+			{!!workflows.length && (
+				<div>
+					<h2 className="text-xl">Existing Workflows</h2>
+					<ul className="mt-5 flex flex-col gap-2">
+						{workflows.map((workflow) => (
+							<li
 								onClick={() =>
 									handleSelectWorkflow(workflow.id)
 								}
+								className="p-3 px-6 border cursor-pointer rounded border-border-color bg-background text-[16px]"
+								key={workflow.id}
 							>
 								{workflow.name}
-							</button>
-						</li>
-					))}
-				</ul>
-			</div>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 		</div>
 	);
 };

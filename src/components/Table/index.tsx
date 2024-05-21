@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import './TableStyle.css';
-import { ReactComponent as Arrow } from 'assets/svg/arrow.svg';
+import { ReactComponent as SvgArrow } from 'assets/svg/arrow.svg';
 import { TableRow } from 'store/workflowSlice';
 
 interface TableProps {
@@ -51,7 +51,7 @@ const Table: React.FC<TableProps> = ({ data }) => {
 							{Object.keys(data[0]).map((key) => (
 								<th key={key} onClick={() => requestSort(key)}>
 									<div className="table-heading-col">
-										<span>{key}</span> <Arrow />
+										<span>{key}</span> <SvgArrow />
 									</div>
 								</th>
 							))}

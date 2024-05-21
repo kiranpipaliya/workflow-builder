@@ -3,7 +3,6 @@ import { parse } from 'csv-parse/browser/esm/sync';
 import { useDispatch, useSelector } from 'react-redux';
 import DynamicInput from './DynamicInput';
 import { RootState } from 'store/store';
-import { saveWorkflow } from 'store/workflowSlice';
 import {
 	removeNodeData,
 	setNodeData,

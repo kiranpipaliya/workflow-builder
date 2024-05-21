@@ -21,6 +21,14 @@ const nodeSlice = createSlice({
 	name: 'nodes',
 	initialState,
 	reducers: {
+		removeNode: (state, action: PayloadAction<string>) => {
+			state.nodesData = state.nodesData.filter(
+				(node) => node.id !== action.payload,
+			);
+			if (state.selectedNodeData?.nodeId === action.payload) {
+				state.selectedNodeData = null;
+			}
+		},
 		removeNodeData: (state, action: PayloadAction<string>) => {
 			const findNodeIndex = state.nodesData.findIndex(
 				(n) => n.id === action.payload,
@@ -43,8 +51,9 @@ const nodeSlice = createSlice({
 			);
 			if (workflowData) {
 				const workflow = JSON.parse(workflowData);
-				state.nodesData = workflow.nodesData;
-				state.selectedNodeData = workflow.selectedNodeData;
+				state.nodesData = workflow?.nodes?.nodesData || [];
+				state.selectedNodeData =
+					workflow?.nodes?.selectedNodeData || {};
 			}
 		},
 		addNode: (
@@ -98,7 +107,7 @@ const nodeSlice = createSlice({
 				data: TableRow[];
 				position: { x: number; y: number };
 				selectedFile: string | null;
-			}>,
+			} | null>,
 		) => {
 			state.selectedNodeData = action.payload;
 		},
@@ -112,6 +121,7 @@ export const {
 	setSelectedNodeData,
 	loadNodes,
 	removeNodeData,
+	removeNode,
 } = nodeSlice.actions;
 
 export default nodeSlice.reducer;

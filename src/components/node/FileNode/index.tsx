@@ -1,6 +1,9 @@
+import Button from 'components/Button';
 import CsvFileSelectInput from 'components/Form/CsvFileSelectInput';
-import { Handle, Position } from 'reactflow';
-
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
+import { removeNode } from 'store/nodeSlice';
 const handleStyle = {
 	height: '100%',
 	borderRadius: '0 10px 10px 0',
@@ -10,10 +13,23 @@ const handleStyle = {
 	right: '-24px',
 };
 
-const FileNode = ({ data }: any) => {
+const FileNode = ({ nodId, data }: any) => {
+	const updateNodeInternals = useUpdateNodeInternals();
+	const dispatch = useDispatch();
+
+	const handleRemoveNode = () => {
+		dispatch(removeNode(data.id));
+	};
+
+	useEffect(() => {
+		updateNodeInternals(data.id);
+	}, [data, updateNodeInternals]);
+
 	return (
 		<div className="bg-background border border-workflow-color">
-			<div className="py-2 px-3 border-b border-border-color">File</div>
+			<div className="py-2 px-3 border-b border-border-color flex items-center justify-between">
+				File <Button onClick={handleRemoveNode}>X</Button>
+			</div>
 			<div className="py-2 px-3 border-b border-border-color">
 				<CsvFileSelectInput nodeId={data.id} />
 			</div>
@@ -21,7 +37,7 @@ const FileNode = ({ data }: any) => {
 				type="source"
 				style={handleStyle}
 				position={Position.Right}
-				id="a"
+				id="fileData"
 			/>
 		</div>
 	);

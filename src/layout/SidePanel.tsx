@@ -7,12 +7,12 @@ import { addNode } from 'store/nodeSlice';
 const SidePanel = () => {
 	const dispatch = useDispatch();
 
-	const handleAddNode = () => {
+	const handleAddNode = (type: string) => {
 		const newNodeId = `node-${Date.now()}`;
 		dispatch(
 			addNode({
 				id: newNodeId,
-				type: 'FileNode',
+				type,
 				data: [],
 				position: { x: 100, y: 100 },
 				selectedFile: null,
@@ -20,10 +20,27 @@ const SidePanel = () => {
 		);
 	};
 	return (
-		<aside className="side-panel">
-			<div className="flex flex-col gap-5">
-				<h4>Input</h4>
-				<Button onClick={handleAddNode}>Add File Node</Button>
+		<aside className="side-panel flex flex-col gap-6 text-left">
+			<div className="flex flex-col gap-5 border border-border-color p-3">
+				<h4 className="text-lg">Input</h4>
+				<Button
+					className="text-left"
+					onClick={() => handleAddNode('FileNode')}
+				>
+					Add File Node
+				</Button>
+			</div>
+
+			<div className="flex flex-col gap-5 border border-border-color p-3">
+				<h4 className="text-lg">Transformer Nodes</h4>
+				<div className="flex flex-col gap-5">
+					<Button
+						className="text-left"
+						onClick={() => handleAddNode('FilterNode')}
+					>
+						Add Filter Node
+					</Button>
+				</div>
 			</div>
 		</aside>
 	);

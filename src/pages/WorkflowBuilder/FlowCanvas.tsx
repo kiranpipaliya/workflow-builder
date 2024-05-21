@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import ReactFlow, {
 	Background,
 	Controls,
 	addEdge,
 	useEdgesState,
 	useNodesState,
+	Connection,
 } from 'reactflow';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store';
@@ -12,10 +13,13 @@ import {
 	loadNodes,
 	setNodePosition,
 	setSelectedNodeData,
+	setNodeData,
 } from 'store/nodeSlice';
-import { setEdgesData } from 'store/edgeSlice';
-import FileNode from 'components/node/FileNode';
+import { loadEdges, setEdgesData } from 'store/edgeSlice';
+import FileNode from 'components/Node/FileNode';
+import FilterNode from 'components/Node/FilterNode';
 import 'reactflow/dist/style.css';
+import { TableRow } from 'store/workflowSlice';
 
 const FlowCanvas = () => {
 	const dispatch = useDispatch();
@@ -27,15 +31,17 @@ const FlowCanvas = () => {
 	const nodesData = useSelector((state: RootState) => state.nodes.nodesData);
 	const edgesData = useSelector((state: RootState) => state.edges.edgesData);
 
-	const nodeTypes = useMemo(() => ({ FileNode: FileNode }), []);
+	const nodeTypes = useMemo(() => ({ FileNode, FilterNode }), []);
 
 	const [nodes, setNodes, onNodesChange] = useNodesState([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+	const reactFlowWrapper = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (currentWorkflow) {
 			dispatch(loadNodes(currentWorkflow.id));
+			dispatch(loadEdges(currentWorkflow.id));
 		}
-	}, [currentWorkflow?.id]);
+	}, [currentWorkflow?.id, dispatch]);
 
 	useEffect(() => {
 		if (currentWorkflow) {
@@ -55,28 +61,48 @@ const FlowCanvas = () => {
 	}, [currentWorkflow, nodesData, edgesData, setNodes, setEdges]);
 
 	const onConnect = useCallback(
-		(params: any) => {
+		(params: Connection) => {
 			setEdges((eds) => {
-				const newEdges = addEdge(params, eds);
+				const newEdges = addEdge({ ...params, animated: true }, eds);
+
+				const sourceNode = nodes.find(
+					(node) => node.id === params.source,
+				);
+				const targetNode = nodes.find(
+					(node) => node.id === params.target,
+				);
+				if (sourceNode && targetNode) {
+					dispatch(
+						setNodeData({
+							id: targetNode.id,
+							type: targetNode?.type,
+							data: sourceNode.data,
+							position: targetNode.position,
+							selectedFile: null,
+						}),
+					);
+				}
+
 				dispatch(setEdgesData(newEdges));
 				return newEdges;
 			});
 		},
-		[dispatch, setEdges],
+		[dispatch, nodes, setEdges],
 	);
 
 	const handleNodeClick = useCallback(
 		(event: any, node: any) => {
 			const nodeData =
 				nodesData.find((n) => n.id === node.id)?.data || [];
-
+			const data =
+				'data' in nodeData ? (nodeData.data as TableRow[]) : nodeData;
 			dispatch(
 				setSelectedNodeData({
 					nodeId: node.id,
 					type: node.type,
-					data: nodeData,
+					data,
 					position: node.position,
-					selectedFile: node.selectedFile,
+					selectedFile: null,
 				}),
 			);
 		},
@@ -100,9 +126,28 @@ const FlowCanvas = () => {
 		[dispatch, onNodesChange],
 	);
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as HTMLElement;
+			if (
+				reactFlowWrapper.current &&
+				!reactFlowWrapper.current.contains(target as Node) &&
+				!target.closest('.custom-table')
+			) {
+				dispatch(setSelectedNodeData(null));
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [dispatch]);
+
 	return (
 		<div className="w-full h-full">
 			<ReactFlow
+				ref={reactFlowWrapper}
 				nodeTypes={nodeTypes}
 				nodes={nodes}
 				edges={edges}

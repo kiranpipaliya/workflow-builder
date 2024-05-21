@@ -13,8 +13,10 @@ const Header = () => {
 	const dispatch = useDispatch();
 	const handleSaveWorkflow = () => {
 		const nodes = getState().nodes;
+		const edges = getState().edges;
+
 		if (params.workflowId) {
-			dispatch(saveWorkflow(nodes));
+			dispatch(saveWorkflow({ nodes, edges }));
 		}
 	};
 	return (

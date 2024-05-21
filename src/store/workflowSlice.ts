@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from './store';
+import { EdgeState } from './edgeSlice';
 import { NodeState } from './nodeSlice';
 
 export interface TableRow {
@@ -9,7 +9,7 @@ export interface TableRow {
 export interface NodeData {
 	id: string;
 	data: TableRow[];
-	type: string;
+	type: string | undefined;
 	position: { x: number; y: number };
 	selectedFile: string | null;
 }
@@ -60,7 +60,13 @@ const workflowSlice = createSlice({
 		setCurrentWorkflow: (state, action: PayloadAction<string>) => {
 			state.currentWorkflowId = action.payload;
 		},
-		saveWorkflow: (state, action: PayloadAction<NodeState | null>) => {
+		saveWorkflow: (
+			state,
+			action: PayloadAction<{
+				nodes?: NodeState;
+				edges: EdgeState;
+			} | null>,
+		) => {
 			const currentWorkflow = state.workflows.find(
 				(workflow) => workflow.id === state.currentWorkflowId,
 			);
@@ -69,7 +75,6 @@ const workflowSlice = createSlice({
 					...currentWorkflow,
 					...(action?.payload || {}),
 				};
-
 				localStorage.setItem(
 					`workflow-${currentWorkflow.id}`,
 					JSON.stringify(updatedWorkflow),

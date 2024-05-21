@@ -19,8 +19,8 @@ type InputProps =
 	| {
 			type: 'select';
 			options: { value: string; label: string }[];
-			value: string;
 			disabled?: boolean;
+			placeholder?: string;
 			onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 	  };
 
@@ -69,10 +69,12 @@ const DynamicInput: React.FC<InputProps> = (props) => {
 		case 'select':
 			return (
 				<select
-					value={props.value}
 					onChange={props.onChange}
-					className="border border-gray-300 p-2 rounded-lg w-full"
+					className="border px-3 py-2 border-border-color text-font-color w-full bg-primary"
 				>
+					<option selected disabled>
+						{props.placeholder}
+					</option>
 					{props.options.map((option) => (
 						<option key={option.value} value={option.value}>
 							{option.label}

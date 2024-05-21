@@ -1,20 +1,21 @@
 import React from 'react';
 
-type ButtonVariant = 'outlet';
-
 interface ButtonProps {
 	children: React.ReactNode;
-	variant?: ButtonVariant;
+	variant?: 'outlet' | 'solid';
+	className?: string;
 	onClick?: () => void;
 }
 
 const Button: React.FC<ButtonProps> = ({
 	children,
 	variant = 'outlet',
+	className,
 	...res
 }) => {
 	const variantClasses = {
 		outlet: 'hover:bg-tertiary',
+		solid: 'bg-primary border border-border-color hover:bg-background',
 	};
 
 	const buttonClasses = variantClasses[variant];
@@ -22,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({
 	return (
 		<button
 			{...res}
-			className={`px-[6px] py-1 hover-transition ${buttonClasses}`}
+			className={`px-[6px] py-1 hover-transition ${className} ${buttonClasses}`}
 		>
 			{children}
 		</button>
