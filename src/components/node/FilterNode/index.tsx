@@ -153,7 +153,6 @@ const FilterNode = ({ data, ...res }: any) => {
 			data: filteredData as TableRow[],
 		};
 		dispatch(setSelectedNodeData(updatedNodeData));
-		dispatch(setNodeData(updatedNodeData));
 		dispatch(
 			setFilteredNodeData({
 				id: data.id,
