@@ -13,7 +13,7 @@ const handleStyle = {
 	right: '-24px',
 };
 
-const FileNode = ({ nodId, data }: any) => {
+const FileNode = ({ data }: any) => {
 	const updateNodeInternals = useUpdateNodeInternals();
 	const dispatch = useDispatch();
 
@@ -31,7 +31,7 @@ const FileNode = ({ nodId, data }: any) => {
 				File <Button onClick={handleRemoveNode}>X</Button>
 			</div>
 			<div className="py-2 px-3 border-b border-border-color">
-				<CsvFileSelectInput nodeId={data.id} />
+				<CsvFileSelectInput id={data.id} />
 			</div>
 			<Handle
 				type="source"

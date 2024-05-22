@@ -4,9 +4,16 @@ import { Conditions, conditionOptions } from 'constants/conditionConstant';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
-import { removeNode, setFilteredNodeData, setNodeData, setSelectedNodeData } from 'store/nodeSlice';
+import {
+	filterData,
+	removeNode,
+	setFilteredNodeData,
+	setNodeData,
+	setSelectedNodeData,
+} from 'store/nodeSlice';
 import { RootState } from 'store/store';
 import { TableRow } from 'store/workflowSlice';
+import { findDeepestData } from 'utils/findDeepData';
 
 const handleStyle = {
 	height: '100%',
@@ -33,14 +40,18 @@ interface ColumnOption {
 
 const FilterNode = ({ data, ...res }: any) => {
 	const updateNodeInternals = useUpdateNodeInternals();
-	const selectedNode = useSelector((state: RootState) => state.nodes.selectedNodeData);
+	const selectedNode = useSelector(
+		(state: RootState) => state.nodes.selectedNodeData,
+	);
 	const nodeData = useSelector((state: RootState) => state.nodes.nodesData);
-	const currentNode = nodeData.find(node => node.id === res.id);
-	const [filterData, setFilterData] = useState(currentNode?.filterData || {
-		column: 'select column',
-		condition: 'condition',
-		value: 'select Value',
-	});
+	const currentNode = nodeData.find((node) => node.id === res.id);
+	const [filterData, setFilterData] = useState<filterData>(
+		currentNode?.filterData || {
+			column: 'select column',
+			condition: 'condition',
+			value: 'select Value',
+		},
+	);
 	const [columnsOptions, setColumnsOptions] = useState<ColumnOption[]>([]);
 	const [valueOptions, setValueOptions] = useState<ColumnOption[]>([]);
 
@@ -51,8 +62,9 @@ const FilterNode = ({ data, ...res }: any) => {
 	};
 
 	useEffect(() => {
-		if (data?.data?.data?.length > 0) {
-			const firstRow = data.data.data[0];
+		const deepData = findDeepestData(data);
+		if (deepData.length > 0) {
+			const firstRow = deepData[0];
 			const columnNames = Object.keys(firstRow);
 			const formattedColumns = columnNames.map((column) => ({
 				value: column,
@@ -75,7 +87,8 @@ const FilterNode = ({ data, ...res }: any) => {
 			column: value,
 		}));
 
-		const columnValues = data.data.data.map((row: any) => row[value]);
+		const deepData = findDeepestData(data);
+		const columnValues = deepData.map((row: any) => row[value]);
 		const uniqueValues = Array.from(new Set(columnValues));
 		const formattedValues = uniqueValues.map((val) => ({
 			value: val as string,
@@ -102,13 +115,21 @@ const FilterNode = ({ data, ...res }: any) => {
 		}));
 	};
 
-
 	const runFilter = () => {
 		const { column, condition, value } = filterData;
 
-		if (!column || column === "select column" || !condition || condition === "condition" || !value || value === "select Value") return;
-		if(!data?.data?.data) return;
-		const filteredData = data.data.data.filter((row: any) => {
+		if (
+			!column ||
+			column === 'select column' ||
+			!condition ||
+			condition === 'condition' ||
+			!value ||
+			value === 'select Value'
+		)
+			return;
+		const deepData = findDeepestData(data);
+		if (!deepData.length) return;
+		const filteredData = deepData.filter((row: any) => {
 			switch (condition) {
 				case Conditions.IS_EQUAL:
 					return row[column] === value;
@@ -122,20 +143,23 @@ const FilterNode = ({ data, ...res }: any) => {
 					return false;
 			}
 		});
-		
+
 		const updatedNodeData = {
 			...selectedNode,
-			nodeId: selectedNode?.nodeId ?? '',
+			id: selectedNode?.id ?? '',
 			type: selectedNode?.type ?? '',
 			position: selectedNode?.position ?? { x: 0, y: 0 },
 			selectedFile: selectedNode?.selectedFile ?? null,
 			data: filteredData as TableRow[],
 		};
 		dispatch(setSelectedNodeData(updatedNodeData));
-		dispatch(setFilteredNodeData({
-			nodeId: data.id,
-			filterData,
-		}));
+		dispatch(setNodeData(updatedNodeData));
+		dispatch(
+			setFilteredNodeData({
+				id: data.id,
+				filterData,
+			}),
+		);
 	};
 
 	return (
@@ -177,13 +201,13 @@ const FilterNode = ({ data, ...res }: any) => {
 				style={targetStyle}
 				type="target"
 				position={Position.Left}
-				id="a"
+				id={`FilterData-target-${data.id}`}
 			/>
 			<Handle
 				type="source"
 				style={handleStyle}
 				position={Position.Right}
-				id="b"
+				id={`FilterData-source-${data.id}`}
 			/>
 		</div>
 	);

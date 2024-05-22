@@ -1,19 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NodeData, TableRow } from './workflowSlice';
 
+export interface filterData {
+	column: string;
+	condition: string;
+	value: string;
+}
+
 export interface NodeState {
 	nodesData: NodeData[];
 	selectedNodeData: {
-		nodeId: string;
+		id: string;
 		type: string;
 		position: { x: number; y: number };
 		data: TableRow[] | [];
 		selectedFile: string | null;
-		filterData?: {
-			column: string;
-			condition: string;
-			value: string;
-		  };
+		filterData?: filterData;
 	} | null;
 }
 
@@ -30,7 +32,7 @@ const nodeSlice = createSlice({
 			state.nodesData = state.nodesData.filter(
 				(node) => node.id !== action.payload,
 			);
-			if (state.selectedNodeData?.nodeId === action.payload) {
+			if (state.selectedNodeData?.id === action.payload) {
 				state.selectedNodeData = null;
 			}
 		},
@@ -107,7 +109,7 @@ const nodeSlice = createSlice({
 		setSelectedNodeData: (
 			state,
 			action: PayloadAction<{
-				nodeId: string;
+				id: string;
 				type: string;
 				data: TableRow[];
 				position: { x: number; y: number };
@@ -119,21 +121,20 @@ const nodeSlice = createSlice({
 		setFilteredNodeData: (
 			state,
 			action: PayloadAction<{
-			  nodeId: string;
-			  filterData: {
-				column: string;
-				condition: string;
-				value: string;
-			  };
-
+				id: string;
+				filterData: {
+					column: string;
+					condition: string;
+					value: string;
+				};
 			}>,
-		  ) => {
-			const { nodeId, filterData } = action.payload;
-			const node = state.nodesData.find((node) => node.id === nodeId);
+		) => {
+			const { id, filterData } = action.payload;
+			const node = state.nodesData.find((node) => node.id === id);
 			if (node) {
-			  node.filterData = filterData;
+				node.filterData = filterData;
 			}
-		  },
+		},
 	},
 });
 
@@ -144,7 +145,8 @@ export const {
 	setSelectedNodeData,
 	loadNodes,
 	removeNodeData,
-	removeNode,setFilteredNodeData,
+	removeNode,
+	setFilteredNodeData,
 } = nodeSlice.actions;
 
 export default nodeSlice.reducer;

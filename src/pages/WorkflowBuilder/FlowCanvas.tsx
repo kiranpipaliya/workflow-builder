@@ -68,9 +68,11 @@ const FlowCanvas = () => {
 				const sourceNode = nodes.find(
 					(node) => node.id === params.source,
 				);
+
 				const targetNode = nodes.find(
 					(node) => node.id === params.target,
 				);
+
 				if (sourceNode && targetNode) {
 					dispatch(
 						setNodeData({
@@ -102,7 +104,7 @@ const FlowCanvas = () => {
 			if (nodeData?.type !== 'FilterNode') {
 				dispatch(
 					setSelectedNodeData({
-						nodeId: node.id,
+						id: node.id,
 						type: node.type,
 						data,
 						position: node.position,

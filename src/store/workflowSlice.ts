@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { EdgeState } from './edgeSlice';
-import { NodeState } from './nodeSlice';
+import { filterData, NodeState } from './nodeSlice';
 
 export interface TableRow {
 	[key: string]: string | number | boolean;
@@ -12,11 +12,7 @@ export interface NodeData {
 	type: string | undefined;
 	position: { x: number; y: number };
 	selectedFile: string | null;
-	filterData?: {
-		column: string;
-		condition: string;
-		value: string;
-	  };
+	filterData?: filterData;
 }
 
 interface EdgeData {

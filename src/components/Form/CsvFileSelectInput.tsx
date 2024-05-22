@@ -10,17 +10,17 @@ import {
 } from 'store/nodeSlice';
 import Button from 'components/Button';
 
-const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
+const CsvFileSelectInput = ({ id }: { id?: string }) => {
 	const dispatch = useDispatch();
 
 	const selectedNode = useSelector(
 		(state: RootState) => state.nodes.selectedNodeData,
 	);
 	const node = useSelector((state: RootState) =>
-		state.nodes.nodesData.find((n) => n.id === nodeId),
+		state.nodes.nodesData.find((n) => n.id === id),
 	);
 	const handleRemoveFile = () => {
-		dispatch(removeNodeData(nodeId!));
+		dispatch(removeNodeData(id!));
 	};
 
 	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +37,7 @@ const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 				if (selectedNode) {
 					dispatch(
 						setNodeData({
-							id: selectedNode.nodeId,
+							id: selectedNode.id,
 							type: selectedNode.type,
 							data: records,
 							position: selectedNode.position,
@@ -46,7 +46,7 @@ const CsvFileSelectInput = ({ nodeId }: { nodeId?: string }) => {
 					);
 					dispatch(
 						setSelectedNodeData({
-							nodeId: selectedNode.nodeId,
+							id: selectedNode.id,
 							type: selectedNode.type,
 							data: records,
 							position: selectedNode.position,
