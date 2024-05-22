@@ -9,6 +9,11 @@ export interface NodeState {
 		position: { x: number; y: number };
 		data: TableRow[] | [];
 		selectedFile: string | null;
+		filterData?: {
+			column: string;
+			condition: string;
+			value: string;
+		  };
 	} | null;
 }
 
@@ -111,6 +116,24 @@ const nodeSlice = createSlice({
 		) => {
 			state.selectedNodeData = action.payload;
 		},
+		setFilteredNodeData: (
+			state,
+			action: PayloadAction<{
+			  nodeId: string;
+			  filterData: {
+				column: string;
+				condition: string;
+				value: string;
+			  };
+
+			}>,
+		  ) => {
+			const { nodeId, filterData } = action.payload;
+			const node = state.nodesData.find((node) => node.id === nodeId);
+			if (node) {
+			  node.filterData = filterData;
+			}
+		  },
 	},
 });
 
@@ -121,7 +144,7 @@ export const {
 	setSelectedNodeData,
 	loadNodes,
 	removeNodeData,
-	removeNode,
+	removeNode,setFilteredNodeData,
 } = nodeSlice.actions;
 
 export default nodeSlice.reducer;

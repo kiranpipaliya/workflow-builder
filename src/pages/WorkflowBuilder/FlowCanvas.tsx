@@ -16,8 +16,8 @@ import {
 	setNodeData,
 } from 'store/nodeSlice';
 import { loadEdges, setEdgesData } from 'store/edgeSlice';
-import FileNode from 'components/Node/FileNode';
-import FilterNode from 'components/Node/FilterNode';
+import FileNode from 'components/node/FileNode';
+import FilterNode from 'components/node/FilterNode';
 import 'reactflow/dist/style.css';
 import { TableRow } from 'store/workflowSlice';
 
@@ -92,19 +92,24 @@ const FlowCanvas = () => {
 
 	const handleNodeClick = useCallback(
 		(event: any, node: any) => {
-			const nodeData =
-				nodesData.find((n) => n.id === node.id)?.data || [];
+			const nodeData = nodesData.find((n) => n.id === node.id);
+
+			const currentNodeData = nodeData?.data || [];
 			const data =
-				'data' in nodeData ? (nodeData.data as TableRow[]) : nodeData;
-			dispatch(
-				setSelectedNodeData({
-					nodeId: node.id,
-					type: node.type,
-					data,
-					position: node.position,
-					selectedFile: null,
-				}),
-			);
+				'data' in currentNodeData
+					? (currentNodeData.data as TableRow[])
+					: currentNodeData;
+			if (nodeData?.type !== 'FilterNode') {
+				dispatch(
+					setSelectedNodeData({
+						nodeId: node.id,
+						type: node.type,
+						data,
+						position: node.position,
+						selectedFile: null,
+					}),
+				);
+			}
 		},
 		[nodesData, dispatch],
 	);
@@ -132,7 +137,8 @@ const FlowCanvas = () => {
 			if (
 				reactFlowWrapper.current &&
 				!reactFlowWrapper.current.contains(target as Node) &&
-				!target.closest('.custom-table')
+				!target.closest('.custom-table') &&
+				!target.closest('.footer-header')
 			) {
 				dispatch(setSelectedNodeData(null));
 			}

@@ -12,6 +12,11 @@ export interface NodeData {
 	type: string | undefined;
 	position: { x: number; y: number };
 	selectedFile: string | null;
+	filterData?: {
+		column: string;
+		condition: string;
+		value: string;
+	  };
 }
 
 interface EdgeData {

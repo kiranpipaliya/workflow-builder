@@ -8,6 +8,9 @@
 			}
 		}
 	}
+	.footer-header {
+		@apply flex items-center gap-3;
+	}
 	.footer-body {
 		@apply my-3 px-6;
 	}

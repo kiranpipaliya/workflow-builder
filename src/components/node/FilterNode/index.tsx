@@ -1,10 +1,12 @@
 import Button from 'components/Button';
 import DynamicInput from 'components/Form/DynamicInput';
-import { conditionOptions } from 'constants/conditionConstant';
+import { Conditions, conditionOptions } from 'constants/conditionConstant';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
-import { removeNode } from 'store/nodeSlice';
+import { removeNode, setFilteredNodeData, setNodeData, setSelectedNodeData } from 'store/nodeSlice';
+import { RootState } from 'store/store';
+import { TableRow } from 'store/workflowSlice';
 
 const handleStyle = {
 	height: '100%',
@@ -29,9 +31,12 @@ interface ColumnOption {
 	label: string;
 }
 
-const FilterNode = ({ data }: any) => {
+const FilterNode = ({ data, ...res }: any) => {
 	const updateNodeInternals = useUpdateNodeInternals();
-	const [filterData, setFilterData] = useState({
+	const selectedNode = useSelector((state: RootState) => state.nodes.selectedNodeData);
+	const nodeData = useSelector((state: RootState) => state.nodes.nodesData);
+	const currentNode = nodeData.find(node => node.id === res.id);
+	const [filterData, setFilterData] = useState(currentNode?.filterData || {
 		column: 'select column',
 		condition: 'condition',
 		value: 'select Value',
@@ -97,7 +102,41 @@ const FilterNode = ({ data }: any) => {
 		}));
 	};
 
-	const runFilter = () => {};
+
+	const runFilter = () => {
+		const { column, condition, value } = filterData;
+
+		if (!column || column === "select column" || !condition || condition === "condition" || !value || value === "select Value") return;
+		if(!data?.data?.data) return;
+		const filteredData = data.data.data.filter((row: any) => {
+			switch (condition) {
+				case Conditions.IS_EQUAL:
+					return row[column] === value;
+				case Conditions.IS_NOT_EQUAL_TO:
+					return row[column] !== value;
+				case Conditions.INCLUDES:
+					return row[column].includes(value);
+				case Conditions.DOES_NOT_INCLUDE:
+					return !row[column].includes(value);
+				default:
+					return false;
+			}
+		});
+		
+		const updatedNodeData = {
+			...selectedNode,
+			nodeId: selectedNode?.nodeId ?? '',
+			type: selectedNode?.type ?? '',
+			position: selectedNode?.position ?? { x: 0, y: 0 },
+			selectedFile: selectedNode?.selectedFile ?? null,
+			data: filteredData as TableRow[],
+		};
+		dispatch(setSelectedNodeData(updatedNodeData));
+		dispatch(setFilteredNodeData({
+			nodeId: data.id,
+			filterData,
+		}));
+	};
 
 	return (
 		<div className="bg-background border relative w-[200px] border-workflow-color">
