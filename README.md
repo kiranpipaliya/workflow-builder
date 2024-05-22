@@ -1,46 +1,100 @@
-# Getting Started with Create React App
+# Workflow Builder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React and Tailwind CSS application for building and managing workflows. Users can create new workflows, add CSV files, connect nodes, and manage workflow data visually.
 
-## Available Scripts
+# Features
 
-In the project directory, you can run:
+-   **Create New Workflow:** Users can create new workflows and manage them independently.
+-   **CSV File Integration:** Add and manage CSV files within workflows.
+-   **Node Management:** Two types of nodes available:
 
-### `npm start`
+    -   **File Select Node:** For selecting CSV files.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+    -   **Filter Node:** For applying filters on CSV data.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+-   **Drag and Drop:** Users can move nodes around the canvas.
+-   **Node Connections:** Connect nodes using arrows to define data flow.
+-   **Data Display:** Click on a node to display its data output below the canvas.
+-   **Export Data:** Export the data of selected nodes as a CSV file.
+-   **Save Workflow:** Save the entire workflow for future use.
 
-### `npm test`
+## Table of Contents
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+-   [Features](#features)
+-   [Installation](#installation)
+-   [Usage](#usage)
+-   [Folder Structure](#folder-structure)
 
-### `npm run build`
+## Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To install the necessary dependencies, use Node.js v18.18.2 or later, and run:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Usage
 
-### `npm run eject`
+To start the development server, run:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm start
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Folder Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Here is an overview of the folder structure of the project:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+src/
+├── assets/
+│   └── svg/
+│       ├── arrow.svg
+│       └── logo.svg
+├── components/
+│   ├── Button/
+│   ├── Form/
+│   ├── node/
+│   └── Table/
+├── constants/
+│   └── conditionConstant.ts
+├── layout/
+│   ├── Footer.tsx
+│   ├── FooterStyle.css
+│   ├── Header.tsx
+│   ├── HeaderStyle.css
+│   ├── Layout.tsx
+│   └── LayoutStyle.css
+├── pages/
+│   ├── Dashboard/
+│   └── WorkflowBuilder/
+├── store/
+│   ├── edgeSlice.ts
+│   ├── nodeSlice.ts
+│   ├── store.ts
+│   └── workflowSlice.ts
+├── utils/
+│   └── convertToCSV.ts
+├── App.tsx
+├── index.css
+├── index.tsx
+├── react-app-env.d.ts
+├── reportWebVitals.ts
+├── setupTests.ts
+├── .gitignore
+├── file-saver.d.ts
+├── package-lock.json
+├── package.json
+├── README.md
+├── tailwind.config.js
+├── tsconfig.json
+└── webpack.config.ts
+```
 
-## Learn More
+## Features
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To start the development server, run:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm start
+```
